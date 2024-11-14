@@ -1,0 +1,129 @@
+'work for TOPAS verison5
+macro Out_CIF(file)
+   {
+      Out_CIF(file,)
+   }
+macro Out_CIF(file, with_id)
+   {
+      out file
+      		if Prm_There(cell_formula_units_Z) {
+      		} else {
+      		local !cell_formula_units_Z = 1;}
+         Out(Get(phase_name),"\ndata_%s\n")                       
+         Out(Get(phase_name), "\n_chemical_name_mineral %s")    
+         local !chemical_formula_weight = Get(cell_mass)/cell_formula_units_Z;
+         Out(chemical_formula_weight, "\n_chemical_formula_weight %11.5f")
+         Out_String("\n_chemical_formula_sum ?")
+		 Out_String("\n_chemical_formula_moiety ?")
+       Out_String("\n\n_space_group_crystal_system ?")
+       Out(Get(sp_grp_char), "\n_symmetry_space_group_name_H-M %s")
+		 Out_String("\n_symmetry_space_group_name_Hall ?")
+         Out_String("\n\nloop_")
+         #m_ifarg with_id ""
+            Out_String("\n\t_symmetry_equiv_pos_as_xyz")
+            Out(Get(sp_xyzs_txt),  "%s")
+         #m_else
+            Out_String("\n\t_symmetry_equiv_pos_site_id\n\t_symmetry_equiv_pos_as_xyz")
+            Out(Get(sp_xyzs_txt_with_id),  "%s")
+         #m_endif
+         
+         'cell parameter block
+         Out(Get(a), "\n\n_cell_length_a  %V")
+         Out(Get(b), "\n_cell_length_b  %V")
+         Out(Get(c), "\n_cell_length_c  %V")
+         Out(Get(al), "\n_cell_angle_alpha %V")
+         Out(Get(be), "\n_cell_angle_beta  %V")
+         Out(Get(ga), "\n_cell_angle_gamma %V")
+         Out_String("\n_cell_measurement_temperature  298")
+         Out(Get(cell_volume), "\n_cell_volume %V")
+         Out(cell_formula_units_Z, "\n_cell_formula_units_Z %3.0f")
+         local !density = ((1.6605402 Get(cell_mass)) / Get(cell_volume));
+         Out(density, "\n_exptl_crystal_density_diffrn %2.5f")
+
+
+         'experiment block
+         Out_String("\n\n_diffrn_ambient_temperature  298")          'manual input        
+	 		Out_String("\n_diffrn_source  synchrotron")                 'manual input
+	 		Out_String("\n_diffrn_measurement_device_type  ESRF-ID22")  'manual input    
+	 		Out_String("\n_diffrn_detector  MAC")                       'manual input
+	 		Out_String("\n_diffrn_radiation_type  synchrotron")         'manual input
+	 		Out(Get(lam), "\n_diffrn_radiation_wavelength %1.5f")
+	 		
+         Out_String("\n\n_pd_spec_mounting  packed")
+         Out_String("\n_pd_spec_mount_mode  transmission")
+         Out_String("\n_pd_spec_shape  cylinder")    
+         Out_String("\n_pd_meas_2theta_range_min  ?")     'manual input
+         Out_String("\n_pd_meas_2theta_range_max  ?")     'manual input
+         Out_String("\n_pd_meas_scan_method  cont")
+         Out(Get(x_calculation_step), "\n_pd_meas_2theta_range_inc  %V")
+         
+         'refinement block
+         Out_String("\n_computing_structure_refinement  TOPAS")
+         local !points = ((Get(finish_X)-Get(start_X)) / Get(x_calculation_step));
+         Out(points, "\n\n_pd_proc_number_of_points  %V")
+	 		Out(Get(start_X), "\n_pd_proc_2theta_range_min  %V")
+         Out(Get(finish_X), "\n_pd_proc_2theta_range_max  %V")
+         Out(Get(x_calculation_step), "\n_pd_proc_2theta_range_inc  %V") 
+         Out(Get(lam), "\n_pd_proc_wavelength %1.5f")
+         Out_String("\n_pd_proc_ls_profile_function  pseudo-Voigt")   
+         Out_String("\n_pd_proc_ls_background_function  Chebyshev")     
+     		Out(Get(r_p), "\n_pd_proc_ls_prof_R_factor %1.5f")
+     		Out(Get(r_wp), "\n_pd_proc_ls_prof_wR_factor %1.5f")
+     		Out(Get(r_exp), "\n_pd_proc_ls_prof_wR_expected %1.5f")    
+     		Out(Get(r_bragg), "\n_refine_ls_R_factor_all %1.5f")
+     		Out(Get(gof), "\n_refine_ls_goodness_of_fit_all %1.5f")
+         Out_String("\n_refine_ls_structure_factor_coef  Inet")      'manual input
+	 		Out_String("\n_refine_ls_matrix_type  fullcycle")           'manual input
+	 		Out_String("\n_refine_ls_weighting_scheme  sigma")          'manual input
+	 		Out_String("\n_refine_ls_hydrogen_treatment  mixed")        'manual input
+	 		Out_String("\n_refine_ls_extinction_method  none")          'manual input 
+	 		Out(Get(number_independent_parameters), "\n_refine_ls_number_parameters %g")             
+	 		Out(Abs(Get(refine_ls_shift_on_su_max)/30), "\n_refine_ls_shift/su_max %3.4f")
+	 		
+         Out_String("\n\nloop_")
+            Out_String("\n_atom_site_label")
+            Out_String("\n_atom_site_type_symbol")
+            Out_String("\n_atom_site_symmetry_multiplicity")
+            Out_String("\n_atom_site_fract_x")
+            Out_String("\n_atom_site_fract_y")
+            Out_String("\n_atom_site_fract_z")
+            Out_String("\n_atom_site_occupancy")
+            Out_String("\n_atom_site_B_iso_or_equiv")
+            atom_out file append
+               load out_record out_fmt out_eqn
+               {
+                  "\n%s" = Get_From_String(Get(current_atom), site);
+                  " %s" = Get_From_String(Get(current_atom), atom);
+                  " %3.0f" = Get_From_String(Get(current_atom), num_posns);
+                  " %V" = Get_From_String(Get(current_atom), x);
+                  " %V" = Get_From_String(Get(current_atom), y);
+                  " %V" = Get_From_String(Get(current_atom), z);
+                  " %V" = Get_From_String(Get(current_atom), occ);
+                  " %V" = Get_From_String(Get(current_atom), beq);
+               }
+         
+               
+        out file append
+		Out_String("\n\n")
+      Out(Get(cif_bonds_angles), "%s")
+		Out_String("\n\n")
+		
+		'data block
+		Out_String("\nloop_")
+	   Out_String("\n\t_pd_meas_2theta_scan")
+	   Out_String("\n\t_pd_proc_intensity_total")
+	   Out_String("\n\t_pd_calc_intensity_total")
+	   'Out_String("\n\t_pd_proc_intensity_bkg_calc") 'need v7
+	   Out_String("\n\t_pd_proc_ls_weight")
+	   xdd_out file append
+	   		load out_record out_fmt out_eqn {
+	   	 				"\n%11.6f  " = X;
+			 				"  %11.6f  " = Yobs;
+			 				"  %11.6f  " = Ycalc;
+			 			'	"  %11.6f  " = Get(bkg); 'need to use v7 
+			 				"  %11.6f  " = Get(weighting);
+			 				}
+		out file append
+		Out_String("\n\n")
+	   
+   }
