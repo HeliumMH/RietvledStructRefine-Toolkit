@@ -1,4 +1,5 @@
 'work for TOPAS verison5
+
 macro Out_CIF(file)
    {
       Out_CIF(file,)
@@ -14,10 +15,10 @@ macro Out_CIF(file, with_id)
          local !chemical_formula_weight = Get(cell_mass)/cell_formula_units_Z;
          Out(chemical_formula_weight, "\n_chemical_formula_weight %11.5f")
          Out_String("\n_chemical_formula_sum ?")
-		 Out_String("\n_chemical_formula_moiety ?")
-       Out_String("\n\n_space_group_crystal_system ?")
-       Out(Get(sp_grp_char), "\n_symmetry_space_group_name_H-M %s")
-		 Out_String("\n_symmetry_space_group_name_Hall ?")
+		   Out_String("\n_chemical_formula_moiety ?")
+         Out_String("\n\n_space_group_crystal_system ?")
+         Out(Get(sp_grp_char), "\n_symmetry_space_group_name_H-M %s")
+		   Out_String("\n_symmetry_space_group_name_Hall ?")
          Out_String("\n\nloop_")
          #m_ifarg with_id ""
             Out_String("\n\t_symmetry_equiv_pos_as_xyz")
@@ -52,26 +53,27 @@ macro Out_CIF(file, with_id)
          Out_String("\n\n_pd_spec_mounting  packed")
          Out_String("\n_pd_spec_mount_mode  transmission")
          Out_String("\n_pd_spec_shape  cylinder")    
-         Out_String("\n_pd_meas_2theta_range_min  ?")     'manual input
-         Out_String("\n_pd_meas_2theta_range_max  ?")     'manual input
-         Out_String("\n_pd_meas_scan_method  cont")
-         Out(Get(x_calculation_step), "\n_pd_meas_2theta_range_inc  %V")
-         
+         Out_String("\n_pd_meas_2theta_range_min ?")                 'manual input start tth of measured
+         Out_String("\n_pd_meas_2theta_range_max ?")                 'manual input max tth of measured
+         local !count_step=Get(x_calculation_step) * Get(convolution_step);
+         Out(count_step, "\n_pd_meas_2theta_range_inc  %V")         
+
+
          'refinement block
          Out_String("\n_computing_structure_refinement  TOPAS")
          local !points = ((Get(finish_X)-Get(start_X)) / Get(x_calculation_step));
          Out(points, "\n\n_pd_proc_number_of_points  %V")
 	 		Out(Get(start_X), "\n_pd_proc_2theta_range_min  %V")
-         Out(Get(finish_X), "\n_pd_proc_2theta_range_max  %V")
-         Out(Get(x_calculation_step), "\n_pd_proc_2theta_range_inc  %V") 
-         Out(Get(lam), "\n_pd_proc_wavelength %1.5f")
+         Out(Get(finish_X), "\n_pd_proc_2theta_range_max %V")
+         Out(count_step, "\n_pd_proc_2theta_range_inc  %V") 
+         Out(Get(lam), "\n_pd_proc_wavelength %1.6f")
          Out_String("\n_pd_proc_ls_profile_function  pseudo-Voigt")   
          Out_String("\n_pd_proc_ls_background_function  Chebyshev")     
-     		Out(Get(r_p), "\n_pd_proc_ls_prof_R_factor %1.5f")
-     		Out(Get(r_wp), "\n_pd_proc_ls_prof_wR_factor %1.5f")
-     		Out(Get(r_exp), "\n_pd_proc_ls_prof_wR_expected %1.5f")    
-     		Out(Get(r_bragg), "\n_refine_ls_R_factor_all %1.5f")
-     		Out(Get(gof), "\n_refine_ls_goodness_of_fit_all %1.5f")
+     		Out(Get(r_p), "\n_pd_proc_ls_prof_R_factor %1.3f")
+     		Out(Get(r_wp), "\n_pd_proc_ls_prof_wR_factor %1.3f")
+     		Out(Get(r_exp), "\n_pd_proc_ls_prof_wR_expected %1.3f")    
+     		Out(Get(r_bragg), "\n_refine_ls_R_factor_all %1.3f")
+     		Out(Get(gof), "\n_refine_ls_goodness_of_fit_all %1.3f")
          Out_String("\n_refine_ls_structure_factor_coef  Inet")      'manual input
 	 		Out_String("\n_refine_ls_matrix_type  fullcycle")           'manual input
 	 		Out_String("\n_refine_ls_weighting_scheme  sigma")          'manual input
@@ -103,7 +105,7 @@ macro Out_CIF(file, with_id)
                }
          
                
-        out file append
+      out file append
 		Out_String("\n\n")
       Out(Get(cif_bonds_angles), "%s")
 		Out_String("\n\n")
