@@ -1,0 +1,17 @@
+macro RR1{  @  }
+macro TT1{  @  }
+
+''site1 CO2
+prm   occ1  0.23654`_0.02341 min 0 max 1 '0.20295_0.01121
+prm   beq1  2.58227`_3.77515 min 1 max 10
+site C001a   x  0 y  0 z 0 occ C =occ1; beq =beq1;
+site O002a   x  0 y  0 z 0 occ O =occ1; beq =beq1;
+site O003a   x  0 y  0 z 0 occ O =occ1; beq =beq1;
+rigid load z_matrix
+{
+C001a
+O002a C001a 1.162
+O003a C001a 1.162 O002a -180
+}
+Rotate_about_axies(  RR1  0 ,  RR1  0 , RR1 0 )
+Translate(  TT1  0 ,TT1  0 , TT1  0 )
